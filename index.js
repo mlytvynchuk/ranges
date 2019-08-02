@@ -61,31 +61,16 @@ class Ranges {
         this.list.push(range);
       }
     }
-    isConstistAll(range, element){
-        if(range[0] >= element[0] && range[1] <= element[1]){
-            return true;
-        }
-        return false;
-    }
     isNumberInRange(range, number){
         if(range[0] - number <=1 && number - range[1] <=1){
             return true;
         }
         return false;
     }
-    isNumberInStrictRange(range, number){
-        console.log(range, number);
-        if (range[0] && range[1]){}
-        // if(number >= range[0] && number <= range[1]){
-        //     return true;
-        // }
-        return false;
-    }
     isCooperation(range, element){
         // range - new element
         // element - old element
         if((range[0] - element[1] <=1 || (range[0]>=element[0] && range[0] <= element[1])) && range[1] >= element[1] ){
-
             return true;
         }
         else if(this.isNumberInRange(element, range[1]) && range[0] <= element[0]){ 
@@ -97,55 +82,42 @@ class Ranges {
         return false;
     }
     
-    removeAndChangeEl(index, values){
-        this.list.splice(index, 1);
-        values.map(el => {
-            this.list.push(el);
-        })
-    }
     /**
      * Removes a range from the list
      */
     remove(range) {
-        
-        let ourNewRanges = [];
-        for (let i = 0; i < this.list.length; i++) {
-            // range from our list
-            var element = this.list[i];
-            console.log(range[0],element)
-            if(range[0] <= element[0] && range[1] >= element[1]){
-                
-                this.list.splice(i,1);
-                element = this.list[i];
-            }
-            if (range[0] >= element[0] && range[1] <= element[1]){
-                if(range[0] != element[0]){
-                    ourNewRanges.push([element[0],range[0]-1]);
-                    this.removeAndChangeEl(i, ourNewRanges);
+        function removeFromList(list,index, one,two){
+            list.splice(index, 1);
+            let count = 0;
+                if(one){
+                    list.splice(index,0,one);
+                    count+=1;
+                } 
+                if(two){
+                    list.splice(index,0,two);
                 }
-                if(range[0] != range[1]){
-                    ourNewRanges.push([range[1]+1, element[1]]);
-                    this.removeAndChangeEl(i, ourNewRanges);
+        }
+        for (let index = 0; index < this.list.length; index++) {
+            var old_range = this.list[index];
+            if(range[0] >= old_range[0] && range[0] <= old_range[1]) {
+                if (range[0] != old_range[0]){
+                    var one = [old_range[0], range[0]-1];
                 }
-                    console.log("new ranges",ourNewRanges)
-                    
+                if(range[1] < old_range[1]){
+                    var two = [range[1]+1, old_range[1]];
+                }
+                removeFromList(this.list,index,one,two);
             }
-            // if(this.isNumberInStrictRange(element, range[0]) && this.isNumberInStrictRange(element, range[1])){
-            //         if(range[0] != element[0]){
-            //             ourNewRanges.push([element[0],range[0]-1]);
-            //         }
-            //         ourNewRanges.push([range[1]+1, element[1]]);
-            //         this.removeAndChangeEl(i, ourNewRanges);
-            // }
-            if(element[1] >= range[1] && element[0] <= range[1]){
-
-                element[0] = range[1]+1;
+            
+            else if (range[1] >= old_range[0] && range[1] < old_range[1]){
+                var one = [range[1] +1, old_range[1]]
+                removeFromList(this.list,index,one,null);
             }
-            else if(this.isNumberInStrictRange(element, range[0])){
-                element[1] = range[0]-1;
+            else if(range[0] < old_range[0] &&range[1] >= old_range[1]){
+                this.list.splice(index, 1);
+                index--;
             }
         }
-        r.print();
     }
     /**
      * Prints out the list of ranges
@@ -156,47 +128,39 @@ class Ranges {
         })
         console.log(this.list);
   } }
-//   // Example
+// Example
   const r = new Ranges();
-//   r.add([1, 4]);
-//   r.print();
-//   // Should display: [1, 4]
-//   r.add([10, 20]);
-//   r.print();
-//   // Should display: [1, 4] [10, 20]
-//   r.add([10, 10]);
-//   r.print();
-//   // Should display: [1, 4] [10, 20]
-//   r.add([21, 21]);
+  r.add([1, 4]);
+  r.print();
+  // Should display: [1, 4]
+  r.add([10, 20]);
+  r.print();
+  // Should display: [1, 4] [10, 20]
+  r.add([10, 10]);
+  r.print();
+  // Should display: [1, 4] [10, 20]
+  r.add([21, 21]);
    
-//   r.print();
-//   // Should display: [1, 4] [10, 21]
-//   r.add([2, 4]);
-//   r.print();
-// //   // Should display: [1, 4] [10, 21]
-//   r.add([3, 8]);
-//   r.print();
-// //   //Should display: [1, 8] [10, 21]
+  r.print();
+  // Should display: [1, 4] [10, 21]
+  r.add([2, 4]);
+  r.print();
+// Should display: [1, 4] [10, 21]
+  r.add([3, 8]);
+  r.print();
+//Should display: [1, 8] [10, 21]
 
 //  console.log("remove...")
-//   r.remove([10, 10]);
-//   r.print();
-// //   // Should display: [1, 8] [11, 21]
-//   r.remove([10, 11]);
-//   r.print();
-// //   // Should display: [1, 8] [12, 21]
-//   r.remove([15, 17]);
-//   r.print();
-// //   // Should display: [1, 8] [12, 14] [18, 21]
-//   r.remove([3, 19]);
-//   r.print();
-// //   // Should display: [1, 2] [20, 21]
-
-r.add([1,10]);
-r.add([20,20])
-r.print()
-r.add([11,19])
-// r.remove([5,20])
-r.print()
-
+  r.remove([10, 10]);
+  r.print();
+// Should display: [1, 8] [11, 21]
+  r.remove([10, 11]);
+  r.print();
+// Should display: [1, 8] [12, 21]
+  r.remove([15, 17]);
+  r.print();
+// Should display: [1, 8] [12, 14] [18, 21]
+  r.remove([3, 19]);
+  r.print();
+// Should display: [1, 2] [20, 21]
 
